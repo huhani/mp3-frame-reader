@@ -222,7 +222,7 @@ var MP3FileReader = function() {
                             totalFrameSize += thisFrameSize;
                             frameSizeDiff += thisFrameSize;
                             lastSampleRateEndOffset = lastFrameOffset;
-                            if(!isVBR) {
+                            if(!isVBR && lastSampleRateFrameCount >= MIN_CORRECT_FRAME_COUNT) {
                                 if(lastBitrate === null) {
                                     lastBitrate = frameData.bitRate;
                                 } else if(lastBitrate !== frameData.bitRate) {
