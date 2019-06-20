@@ -119,7 +119,7 @@ var MP3FileReader = function() {
                             fileSize: filesize,
                             streamSize: durationFromFrameGroups.streamSize,
                             duration: totalTime,
-                            bitrate: durationFromFrameGroups && durationFromFrameGroups.duration || bitrate,
+                            bitrate: bitrate,
                             frameCount: durationFromFrameGroups && durationFromFrameGroups.frameCount || frameCount,
                             isVBR: isVBR,
                             frameGroups: frameGroups,
