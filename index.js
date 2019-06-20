@@ -343,6 +343,8 @@ var MP3FileReader = function() {
             return null;
         }
 
+
+        // This section to read mp3 header is referred from https://github.com/tchakabam/multimedia-js/tree/b433e471c52cafb18308e859cf740acf3222521c
         if(data[0] === 0xFF || (data[1] & 0xE0) === 0xE0) {
             var headerOfVersion = (data[1] >> 3) & 3;
             var headerOfLayer = (data[1] >> 1) & 3;
@@ -359,6 +361,8 @@ var MP3FileReader = function() {
                     ((headerOfVersion === 3 ? 12 : 6) * bitRate * 1000 / sampleRate + padding) << 2 :
                     ((headerOfVersion === 3 ? 144 : 72) * bitRate * 1000 / sampleRate + padding) | 0;
 
+                
+                // This source as reading Vbr header has been referred from https://developers.google.com/web/updates/2015/06/Media-Source-Extensions-for-Audio
                 var MP3Header = null;
                 if(readeHeader && data.length >= 4096) {
                     var secondPerSample = 1/sampleRate;
