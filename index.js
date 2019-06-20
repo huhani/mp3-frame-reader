@@ -1,6 +1,5 @@
 var fs = require('fs');
 
-
 var MP3FileReader = function() {
     var MIN_BUFFER_SIZE = 0x01 << 0x10;
     var MAX_BUFFER_SIZE = MIN_BUFFER_SIZE * 2;
@@ -361,7 +360,7 @@ var MP3FileReader = function() {
                     ((headerOfVersion === 3 ? 12 : 6) * bitRate * 1000 / sampleRate + padding) << 2 :
                     ((headerOfVersion === 3 ? 144 : 72) * bitRate * 1000 / sampleRate + padding) | 0;
 
-                
+
                 // This source as reading Vbr header has been referred from https://developers.google.com/web/updates/2015/06/Media-Source-Extensions-for-Audio
                 var MP3Header = null;
                 if(readeHeader && data.length >= 4096) {
