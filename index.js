@@ -113,11 +113,10 @@ var MP3FileReader = function() {
                         if(durationFromFrameGroups.duration && durationFromFrameGroups.streamSize) {
                             bitrate = Math.round((durationFromFrameGroups.streamSize << 3) / durationFromFrameGroups.duration / 1000);
                         }
-
                         resolve({
                             fileSize: filesize,
                             streamSize: durationFromFrameGroups.streamSize,
-                            duration: totalTime,
+                            duration: durationFromFrameGroups && durationFromFrameGroups.duration || totalTime,
                             bitrate: bitrate,
                             frameCount: durationFromFrameGroups && durationFromFrameGroups.frameCount || frameCount,
                             isVBR: isVBR,
@@ -184,7 +183,7 @@ var MP3FileReader = function() {
                         currentBuffer = currentBuffer.slice(tagFrameSizeDiff);
                         startOffset += tagFrameSizeDiff;
                     }
-                    
+
                     if(!ID3v2TagEndOffset || (ID3v2TagEndOffset && startOffset >= ID3v2TagEndOffset)) {
                         var headerStartOffset = currentBuffer.indexOf(0xFF);
                         if(headerStartOffset > -1) {
