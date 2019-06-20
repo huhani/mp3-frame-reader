@@ -184,16 +184,16 @@ var MP3FileReader = function() {
                         currentBuffer = currentBuffer.slice(tagFrameSizeDiff);
                         startOffset += tagFrameSizeDiff;
                     }
-
+                    
                     if(!ID3v2TagEndOffset || (ID3v2TagEndOffset && startOffset >= ID3v2TagEndOffset)) {
-                        var headerStartOffset = currentBuffer.slice(0x00, 0xFF).indexOf(0xFF);
+                        var headerStartOffset = currentBuffer.indexOf(0xFF);
                         if(headerStartOffset > -1) {
                             if(headerStartOffset > 0) {
                                 currentBuffer = currentBuffer.slice(headerStartOffset);
                                 startOffset += headerStartOffset;
                                 lastFrameOffset = startOffset;
                             }
-                        } else {
+                        } else if(!(endOffset === filesize || endOffset-lastFrameOffset <= 128)) {
                             this.destroy();
                             return reject(new Error('Cannot found mp3 header.'));
                         }
@@ -207,6 +207,9 @@ var MP3FileReader = function() {
                             frameCount++;
                             lastSampleRateFrameCount++;
                             var thisFrameSize = frameData.frameLength;
+                            if(onFrame) {
+                                onFrame(frameData, lastFrameOffset, lastFrameOffset+thisFrameSize, false);
+                            }
                             if(!lastSampleRateStartOffset) {
                                 lastSampleRateStartOffset = lastFrameOffset;
                             }
@@ -238,14 +241,11 @@ var MP3FileReader = function() {
                             }
 
                             bufferTrackCount = 0;
-                            if(onFrame) {
-                                onFrame(frameData, false);
-                            }
                         } else {
                             flushSampleRateOffset();
                             loadedMP3Header = false;
                             if(onFrame) {
-                                onFrame(void 0, true);
+                                onFrame(void 0, null, null, true);
                             }
                             if(bufferTrackCount++ <= MAX_NEXT_BUFFER_TRACK_THRESHOLD) {
                                 var findNextHeader = currentBuffer.indexOf(0xFF, frameSizeDiff+1);
