@@ -1,0 +1,23 @@
+{
+  "name": "mp3-frame-reader",
+  "version": "0.0.1",
+  "description": "To read the mp3 frame to calculate duration from node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huhani/mp3-frame-reader.git"
+  },
+  "keywords": [
+    "mp3",
+    "duration"
+  ],
+  "author": "Huhani",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/huhani/mp3-frame-reader/issues"
+  },
+  "homepage": "https://github.com/huhani/mp3-frame-reader#readme"
+}
