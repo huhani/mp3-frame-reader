@@ -15,10 +15,29 @@ var MP3FileReader = function() {
     var SamplingRateMap = [44100, 48000, 32000, 22050, 24000, 16000, 11025, 12000, 8000];
 
     function MP3FileReader(filepath, onFrame) {
-        return new Promise(function(resolve, reject) {
+        var aborted = false;
+        var hasEnded = false;
+        var __resolve = null;
+        var __reject = null;
+        var isSettled = function() {
+            return hasEnded && aborted;
+        };
+        var AbortFn = function() {
+            if(!isSettled()) {
+                console.log(88884848);
+                aborted = true;
+                __reject(new Error('Aborted.'));
+            }
+        };
+
+        var promise = new Promise(function(resolve, reject) {
+            __resolve = resolve;
+            __reject = reject;
             getFileSize(filepath).then(function(filesize){
+                if(aborted) {
+                    return;
+                }
                 var	readStream = fs.createReadStream( filepath , { highWaterMark: MIN_BUFFER_SIZE} );
-                var hasEnded = false;
                 var isReadable = false;
                 var startOffset = 0;
                 var endOffset = 0;
@@ -47,6 +66,7 @@ var MP3FileReader = function() {
 
                 readStream.on('readable', function() {
                     //( '>> readable event'  );
+
                     isReadable = true;
                     if(!hasStart || requireMoreRead) {
                         hasStart = true;
@@ -83,8 +103,9 @@ var MP3FileReader = function() {
                 });
 
                 var isResolved = false;
+
                 function _resolve() {
-                    if(!isResolved) {
+                    if(!isResolved && !aborted) {
                         isResolved = true;
                         frameGroups = frameGroups.filter(function(each){
                             if(!!(each && each.frames && each.frames >= MIN_CORRECT_FRAME_COUNT)) {
@@ -174,6 +195,7 @@ var MP3FileReader = function() {
                         }
                         if(ID3v2TagEndOffset+1 >= filesize) {
                             this.destroy();
+                            isResolved = true;
                             return reject(new Error("MP3 frame was escaped from origin file."));
                         }
                     }
@@ -194,6 +216,7 @@ var MP3FileReader = function() {
                             }
                         } else if(!(endOffset === filesize || endOffset-lastFrameOffset <= 128)) {
                             this.destroy();
+                            isResolved = true;
                             return reject(new Error('Cannot found mp3 header.'));
                         }
                     }
@@ -288,9 +311,17 @@ var MP3FileReader = function() {
                 }
 
             })['catch'](function(err){
-                reject(err);
+                if(!aborted) {
+                    reject(err);
+                }
             });
         });
+
+        return {
+            abort: AbortFn,
+            isSettled: isSettled,
+            promise: promise
+        };
     }
 
     function getFileSize(filepath) {
